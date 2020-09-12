@@ -6,9 +6,19 @@ import java.util.List;
 import java.util.Optional;
 
 public class Schedule {
+
+    private static Schedule instance;
+
+    public static Schedule getInstance(){
+        if(instance == null){
+            instance = new Schedule();
+        }
+        return instance;
+    }
+
     private List<Subject> schedule;
 
-    public Schedule() {
+    private Schedule() {
         schedule = new ArrayList<>();
     }
 
