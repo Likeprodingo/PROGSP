@@ -12,50 +12,30 @@ public class UDPClient {
 
     public void runClient() {
         //logger started
-        sendMessage(TASK.length(), TASK.getBytes());
-        sendMessage(new Integer(5).byteValue());
-        String result = readMessage();
-        sendMessage(QUIT.length(), QUIT.getBytes());
-
+        try (DatagramSocket socket = new DatagramSocket()) {
+            sendMessage(TASK.length(), TASK.getBytes(), socket);
+            String number = "5";
+            sendMessage(number.length(), number.getBytes(), socket);
+            String result = readMessage(socket);
+            System.out.println(result);
+        } catch (IOException e) {
+            //logger
+        }
         //logger ended
     }
 
-    private boolean sendMessage(int length, byte[] data) {
+    private void sendMessage(int length, byte[] data, DatagramSocket socket) throws IOException {
         boolean result = false;
-        try (DatagramSocket socket = new DatagramSocket()) {
-            DatagramPacket sendPacket = new DatagramPacket(data, length, InetAddress.getByName("127.0.0.1"), 8001);
-            socket.send(sendPacket);
-            result = true;
-        } catch (IOException e) {
-            //logger
-        }
-        return result;
+        DatagramPacket sendPacket = new DatagramPacket(data, length, InetAddress.getByName("127.0.0.1"), 8001);
+        socket.send(sendPacket);
     }
 
-    private boolean sendMessage(byte data) {
-        boolean result = false;
-        byte[] request = new byte[1];
-        request[0] = data;
-        try (DatagramSocket socket = new DatagramSocket()) {
-            DatagramPacket sendPacket = new DatagramPacket(request, 1, InetAddress.getByName("127.0.0.1"), 8001);
-            socket.send(sendPacket);
-            result = true;
-        } catch (IOException e) {
-            //logger
-        }
-        return result;
-    }
-
-    private String readMessage() {
+    private String readMessage(DatagramSocket socket) throws IOException {
         byte[] buf = new byte[512];
         String data = "";
-        try (DatagramSocket socket = new DatagramSocket()) {
-            DatagramPacket recvPacket = new DatagramPacket(buf, buf.length);
-            socket.receive(recvPacket);
-            data = new String(recvPacket.getData()).trim();
-        } catch (IOException e) {
-            //logger;
-        }
+        DatagramPacket recvPacket = new DatagramPacket(buf, buf.length);
+        socket.receive(recvPacket);
+        data = new String(recvPacket.getData()).trim();
         return data;
     }
 

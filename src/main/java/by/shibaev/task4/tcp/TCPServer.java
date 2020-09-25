@@ -22,33 +22,33 @@ public class TCPServer {
              ObjectInputStream inputStream = new ObjectInputStream(clientAccepted.getInputStream());
              ObjectOutputStream outputStream = new ObjectOutputStream(clientAccepted.getOutputStream())) {
             //logger start
-            String clientMessageRecieved;
+            String clientMessageReceived;
             String input;
             do {
-                clientMessageRecieved = (String) inputStream.readObject();
+                clientMessageReceived = (String) inputStream.readObject();
                 //logger
-                switch (clientMessageRecieved) {
+                switch (clientMessageReceived) {
                     case GET_CMD:
-                        clientMessageRecieved = schedule.toString();
+                        clientMessageReceived = schedule.toString();
                         break;
                     case ADD_CMD:
                         input = (String) inputStream.readObject();
-                        schedule.add(new Subject(clientMessageRecieved));
-                        clientMessageRecieved = "DONE";
+                        schedule.add(new Subject(input));
+                        clientMessageReceived = "DONE";
                         break;
                     case EDIT_CMD:
                         input = (String) inputStream.readObject();
-                        clientMessageRecieved = (String) inputStream.readObject();
+                        clientMessageReceived = (String) inputStream.readObject();
                         for (Subject s : schedule.getSchedule()) {
                             if (s.getName().equals(input)){
-                                s.setName(clientMessageRecieved);
+                                s.setName(clientMessageReceived);
                             }
                         }
-                        clientMessageRecieved = "DONE";
+                        clientMessageReceived = "DONE";
                         break;
                 }
-                outputStream.writeObject(clientMessageRecieved);
-            } while (!clientMessageRecieved.equals(QUIT_CMD));
+                outputStream.writeObject(clientMessageReceived);
+            } while (!clientMessageReceived.equals(QUIT_CMD));
         } catch (Exception e) {
             //logger
         }
