@@ -25,7 +25,6 @@ public class UDPClient {
     }
 
     private void sendMessage(int length, byte[] data, DatagramSocket socket) throws IOException {
-        boolean result = false;
         DatagramPacket sendPacket = new DatagramPacket(data, length, InetAddress.getByName("127.0.0.1"), 8001);
         socket.send(sendPacket);
     }

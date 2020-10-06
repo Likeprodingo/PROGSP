@@ -79,6 +79,6 @@ public class Window extends Application {
                 newWindow.show();
             }
         });
-        return new VBox(10.0,fromCities, endCity,button);
+        return new VBox(10.0,fromCities,toCities, endCity,button);
     }
 }
