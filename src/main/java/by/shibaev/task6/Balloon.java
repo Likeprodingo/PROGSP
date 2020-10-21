@@ -1,91 +1,88 @@
 package by.shibaev.task6;
 
+import javafx.animation.PathTransition;
+import javafx.animation.Timeline;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
+import javafx.scene.shape.LineTo;
+import javafx.scene.shape.MoveTo;
+import javafx.scene.shape.Path;
+import javafx.util.Duration;
 
 
 import java.sql.Time;
+import java.util.Random;
 
-public class Balloon extends Pane implements Runnable {
-    private int x;
-    private int y;
-    private int speed;
-    private static int score = 0;
-    private final BooleanProperty booleanProperty = new SimpleBooleanProperty();
+public class Balloon extends ImageView implements Runnable {
+
+    public static int score = 0;
     private ImageView balloonView;
-    private ImageView boomView;
     private boolean isActive = true;
+    private final Image balloon = new Image("images.jpg");
+    private final Image boom = new Image("119774-1.jpg");
+    private Random random = new Random();
 
-    public Balloon(int x, int y, int speed, String balloonImg, String boomImg) {
-        this.x = x;
-        this.y = y;
-        this.speed = speed;
-
-        setWidth(50);
-        setHeight(50);
-        booleanProperty.setValue(true);
-        Image balloon = new Image(balloonImg);
-        balloonView = new ImageView(balloon);
-        balloonView.setX(0);
-        balloonView.setY(0);
-        balloonView.setFitHeight(50);
-        balloonView.setFitWidth(50);
-        getChildren().add(balloonView);
-
-        Image boom = new Image(boomImg);
-        boomView = new ImageView(boom);
-        boomView.setX(x);
-        boomView.setY(y);
-        boomView.setFitHeight(50);
-        boomView.setFitWidth(50);
-        getChildren().add(boomView);
-
-        balloonView.visibleProperty().bind(booleanProperty.not());
-        boomView.visibleProperty().bind(booleanProperty);
-
-        setOnMouseEntered((e) -> {
+    public Balloon() {
+        setImage(balloon);
+        setFitHeight(50);
+        setFitWidth(50);
+        int x = random.nextInt(30) * 9;
+        setX(x);
+        setY(650);
+        setPath();
+        setOnMouseClicked((e) -> {
             score++;
-            booleanProperty.setValue(!booleanProperty.getValue());
-            getChildren().remove(balloonView);
-            try {
-                Thread.sleep(1000);
-            } catch (InterruptedException ex) {
-                ex.printStackTrace();
-            }
-            getChildren().remove(boomView);
-            isActive = false;
+            setImage(boom);
         });
+
     }
 
-    public int getX() {
-        return x;
+    private void setPath() {
+        int x = random.nextInt(30) * 9;
+        int y = 520;
+        Path path = new Path();
+        path.getElements().add(new MoveTo(x, y));
+        path.getElements().add(new LineTo(x, y - 800));
+        PathTransition pathTransition = new PathTransition();
+        pathTransition.setDuration(Duration.millis(9000));
+        pathTransition.setPath(path);
+        pathTransition.setNode(this);
+        pathTransition.setAutoReverse(true);
+        pathTransition.play();
     }
 
-    public int getY() {
-        return y;
+
+    public boolean isActive() {
+        return isActive;
     }
 
-    public void setY(int y) {
-        this.y = y;
+    public void setActive(boolean active) {
+        isActive = active;
     }
 
     @Override
     public void run() {
         while (isActive) {
-            y -= speed;
-            boomView.yProperty().setValue(y);
-            balloonView.yProperty().setValue(y);
-            System.out.println(y);
             try {
+                if (getY() < 0) {
+                    setPath();
+                }
+                if (getImage() == boom){
+                    setImage(balloon);
+                    setPath();
+                }
                 Thread.sleep(200);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
         }
+        setImage(null);
     }
 }
+
